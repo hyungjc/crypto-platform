@@ -1,5 +1,3 @@
-
-
 from os import access
 from flask import render_template
 from flask import request
@@ -7,7 +5,9 @@ import requests
 from flask import Flask, redirect, url_for, request
 from requests.structures import CaseInsensitiveDict
 from datetime import datetime
-
+from operator import itemgetter
+import json
+import itertools
 
 app = Flask(__name__)
 
@@ -15,7 +15,7 @@ var = None
 
 
 def convert_time(unix):
-    datetime_obj = datetime.fromtimestamp(unix/1000)
+    datetime_obj = datetime.fromtimestamp(unix/1000)  # in ms
     return datetime_obj.strftime("%Y.%m.%d")
 
 
@@ -97,9 +97,42 @@ def print_transfers():
     return var.get_transfer()
 
 
-@ app.route('/volume', methods=['POST'])
+@ app.route('/volume')
 def print_volume():
-    return 'hi'
+    url = "https://api.korbit.co.kr/v1/ticker/detailed/all"
+
+    resp = requests.get(url)
+
+    obj = resp.json()
+    # print(obj)
+
+    total_vol = 0.0
+
+    for i in obj:
+        total_vol += float(obj[i]['volume'])
+
+    #obj = sorted(obj.items(), key=lambda x: x[1]['volume'], reverse=True)
+
+    # print(obj)
+
+    dict_vol = {}  # still need to fix sorting doesnt work
+
+    for key in obj:
+        dict_vol[key] = obj[key]['volume']
+
+    print(dict_vol)
+
+    sorted_vol = dict(
+        sorted(dict_vol.items(), key=lambda item: item[1], reverse=True))
+
+    print(sorted_vol)
+
+    sorted_top_five = {}
+
+    sorted_top_five = dict(itertools.islice(sorted_vol.items(), 10))
+    print()
+
+    return json.dumps(sorted_vol)
 
 
 @ app.route('/')
