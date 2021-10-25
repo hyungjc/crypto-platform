@@ -67,10 +67,29 @@ def login():
     return repr(var)
 
 
-@app.route('/transfers')
+@app.route('/transfers', methods=['POST'])
 def print_transfers():
+    pvt = request.form['api_secret']
+    pub = request.form['api_public']
+
+    url = "https://api.korbit.co.kr/v1/oauth2/access_token"
+    headers = CaseInsensitiveDict()
+    headers["Content-Type"] = "application/x-www-form-urlencoded"
+
+    data = "client_id={}&client_secret={}&grant_type=client_credentials".format(
+        pub, pvt)
+    resp = requests.post(url, headers=headers, data=data)
+    # print(resp.status_code)
+    obj = resp.json()
     global var
+    var = Korbit(pvt, pub, obj["access_token"])
+
     return var.get_transfer()
+
+
+@app.route('/volume', methods=['POST'])
+def print_volume():
+    return 'hi'
 
 
 @app.route('/')
@@ -81,3 +100,10 @@ def index():
 if __name__ == "__main__":
 
     app.run(debug=True)
+
+
+# Checklist
+
+# timer for 60mins because accesstoken is valid for 60mins.
+# able to refresh it and if time passes, need to login again using api secret and public keys
+# have charts for assets, for top 5 trading volume, order change of price,
