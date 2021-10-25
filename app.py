@@ -1,4 +1,5 @@
 
+
 from os import access
 from flask import render_template
 from flask import request
@@ -6,6 +7,8 @@ import requests
 from flask import Flask, redirect, url_for, request
 from requests.structures import CaseInsensitiveDict
 app = Flask(__name__)
+
+var = None
 
 
 class Korbit:
@@ -16,6 +19,33 @@ class Korbit:
 
     def __repr__(self):
         return f"{self.secret_token}, {self.public_key}, {self.access_token}"
+
+    # @app.route('/transfers')
+    def get_transfer(self):
+
+        url = "https://api.korbit.co.kr/v1/user/transfers"
+
+        headers = CaseInsensitiveDict()
+        # tbX9maWNvKPqa7t1Cu9ZDsLwtLX7gb8hpjPU8e7P1FrEAeNyBt2JSfrhZ2Eg5
+        headers["Authorization"] = "Bearer {}".format(self.access_token)
+        print(headers)
+
+        resp = requests.get(url, headers=headers)
+
+        print(resp.status_code)
+
+        obj = resp.json()
+        # print(obj["amount"])
+        print(obj)
+        dict = {'deposit': [], 'withdraw': []}
+        for i in obj:
+            if i['type'] == 'deposit':
+                dict['deposit'].append(i['amount'])
+            elif i['type'] == 'withdraw':
+                dict['withdraw'].append(i['amount'])
+
+        print(dict)
+        return dict
 
 
 @app.route('/login', methods=['POST'])
@@ -32,13 +62,38 @@ def login():
     resp = requests.post(url, headers=headers, data=data)
     # print(resp.status_code)
     obj = resp.json()
-    x = Korbit(pvt, pub, obj["access_token"])
-    return repr(x)
+    global var
+    var = Korbit(pvt, pub, obj["access_token"])
+
+    return repr(var)
 
     r = requests.get()
 
 
-def get_transaction()
+""" @app.route('/transfers')
+def get_transfer():
+
+    url = "https://api.korbit.co.kr/v1/user/transfers"
+
+    headers = CaseInsensitiveDict()
+    headers["Authorization"] = "Bearer tbX9maWNvKPqa7t1Cu9ZDsLwtLX7gb8hpjPU8e7P1FrEAeNyBt2JSfrhZ2Eg5"
+    # .format(self.access_token)
+    print(headers)
+
+    resp = requests.get(url, headers=headers)
+
+    print(resp.status_code)
+
+    obj = resp.json()
+    # print(obj["amount"])
+    print(obj)
+    return obj """
+
+
+@app.route('/transfers')
+def print_transfers():
+    global var
+    return var.get_transfer()
 
 
 @app.route('/')
@@ -47,4 +102,5 @@ def index():
 
 
 if __name__ == "__main__":
+
     app.run(debug=True)
