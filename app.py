@@ -6,9 +6,17 @@ from flask import request
 import requests
 from flask import Flask, redirect, url_for, request
 from requests.structures import CaseInsensitiveDict
+from datetime import datetime
+
+
 app = Flask(__name__)
 
 var = None
+
+
+def convert_time(unix):
+    datetime_obj = datetime.fromtimestamp(unix/1000)
+    return datetime_obj.strftime("%Y.%m.%d")
 
 
 class Korbit:
@@ -39,15 +47,17 @@ class Korbit:
         dict = {'deposit': [], 'withdraw': []}
         for i in obj:
             if i['type'] == 'deposit':
-                dict['deposit'].append(i['amount'])
+                dict['deposit'].append(
+                    (convert_time(i['completed_at']), i['amount']))
             elif i['type'] == 'withdraw':
-                dict['withdraw'].append(i['amount'])
+                dict['withdraw'].append(
+                    (convert_time(i['completed_at']), i['amount']))
 
         print(dict)
         return dict
 
 
-@app.route('/login', methods=['POST'])
+@ app.route('/login', methods=['POST'])
 def login():
     pvt = request.form['api_secret']
     pub = request.form['api_public']
@@ -67,7 +77,7 @@ def login():
     return repr(var)
 
 
-@app.route('/transfers', methods=['POST'])
+@ app.route('/transfers', methods=['POST'])
 def print_transfers():
     pvt = request.form['api_secret']
     pub = request.form['api_public']
@@ -87,12 +97,12 @@ def print_transfers():
     return var.get_transfer()
 
 
-@app.route('/volume', methods=['POST'])
+@ app.route('/volume', methods=['POST'])
 def print_volume():
     return 'hi'
 
 
-@app.route('/')
+@ app.route('/')
 def index():
     return render_template('login.html')
 
@@ -107,3 +117,4 @@ if __name__ == "__main__":
 # timer for 60mins because accesstoken is valid for 60mins.
 # able to refresh it and if time passes, need to login again using api secret and public keys
 # have charts for assets, for top 5 trading volume, order change of price,
+# do i need a db? <- thing to consider
