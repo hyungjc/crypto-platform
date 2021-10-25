@@ -26,7 +26,6 @@ class Korbit:
         url = "https://api.korbit.co.kr/v1/user/transfers"
 
         headers = CaseInsensitiveDict()
-        # tbX9maWNvKPqa7t1Cu9ZDsLwtLX7gb8hpjPU8e7P1FrEAeNyBt2JSfrhZ2Eg5
         headers["Authorization"] = "Bearer {}".format(self.access_token)
         print(headers)
 
@@ -66,28 +65,6 @@ def login():
     var = Korbit(pvt, pub, obj["access_token"])
 
     return repr(var)
-
-    r = requests.get()
-
-
-""" @app.route('/transfers')
-def get_transfer():
-
-    url = "https://api.korbit.co.kr/v1/user/transfers"
-
-    headers = CaseInsensitiveDict()
-    headers["Authorization"] = "Bearer tbX9maWNvKPqa7t1Cu9ZDsLwtLX7gb8hpjPU8e7P1FrEAeNyBt2JSfrhZ2Eg5"
-    # .format(self.access_token)
-    print(headers)
-
-    resp = requests.get(url, headers=headers)
-
-    print(resp.status_code)
-
-    obj = resp.json()
-    # print(obj["amount"])
-    print(obj)
-    return obj """
 
 
 @app.route('/transfers')
