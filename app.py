@@ -111,28 +111,25 @@ def print_volume():
     for i in obj:
         total_vol += float(obj[i]['volume'])
 
-    #obj = sorted(obj.items(), key=lambda x: x[1]['volume'], reverse=True)
-
-    # print(obj)
-
-    dict_vol = {}  # still need to fix sorting doesnt work
+    dict_vol = {}
 
     for key in obj:
-        dict_vol[key] = obj[key]['volume']
+        # volume is in shown in terms of currency, so when volume of btc is 'x' means volume in krw is 'x' * price_of_btc
+        dict_vol[key] = float(obj[key]['volume']) * float(obj[key]['last'])
 
-    print(dict_vol)
+    # print(dict_vol)
 
     sorted_vol = dict(
         sorted(dict_vol.items(), key=lambda item: item[1], reverse=True))
 
-    print(sorted_vol)
+    # print(sorted_vol)
 
     sorted_top_five = {}
 
     sorted_top_five = dict(itertools.islice(sorted_vol.items(), 10))
     print()
 
-    return json.dumps(sorted_vol)
+    return json.dumps(sorted_top_five)
 
 
 @ app.route('/')
