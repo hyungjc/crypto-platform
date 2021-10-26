@@ -109,7 +109,9 @@ def print_volume():
     total_vol = 0.0
 
     for i in obj:
-        total_vol += float(obj[i]['volume'])
+        total_vol += float(obj[i]['volume'])*float(obj[i]['last'])
+
+    print(total_vol)
 
     dict_vol = {}
 
@@ -127,7 +129,6 @@ def print_volume():
     sorted_top_five = {}
 
     sorted_top_five = dict(itertools.islice(sorted_vol.items(), 10))
-    print()
 
     return json.dumps(sorted_top_five)
 
@@ -148,3 +149,5 @@ if __name__ == "__main__":
 # able to refresh it and if time passes, need to login again using api secret and public keys
 # have charts for assets, for top 5 trading volume, order change of price,
 # do i need a db? <- thing to consider
+# have separate for people who login and guest access
+# add coinmarketcap price and usdkrw price and compare the kimchi premium with various different korean trading sites (or just korbit for now)
