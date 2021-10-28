@@ -106,6 +106,20 @@ def print_volume():
     obj = resp.json()
     # print(obj)
 
+    # print(obj.keys())
+
+    list_of_currency = list(obj.keys())
+
+    vol_dict = {}
+
+    for curr in list_of_currency:
+        url_vol = "https://api.korbit.co.kr/v1/transactions?time=day&currency_pair={}".format(
+            curr)
+        resp_vol = requests.get(url_vol)
+        obj_vol = resp_vol.json()
+
+        vol_dict[curr] = obj_vol
+
     total_vol = 0.0
 
     for i in obj:
