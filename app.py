@@ -113,10 +113,18 @@ def print_volume():
 
     print(total_vol)
 
+    print(obj)
+
     dict_vol = {}
 
     for key in obj:
-        # volume is in shown in terms of currency, so when volume of btc is 'x' means volume in krw is 'x' * price_of_btc
+        # the comment below doesn't make sense. By doing that logic, the volume price is not correct.
+        # Instead, need to get list of filled orders from 24 hrs ago or from 00:00 onwards and then
+        # sum it up with the amount and the bought price.
+        # can to by get https://api.korbit.co.kr/v1/transactions?time=day&currency_pair=$CURRENCY_PAIR or time = hour
+
+        # volume is in shown in terms of currency, so when volume of btc is 'x' means volume in
+        # krw is 'x' * price_of_btc
         dict_vol[key] = float(obj[key]['volume']) * float(obj[key]['last'])
 
     # print(dict_vol)
