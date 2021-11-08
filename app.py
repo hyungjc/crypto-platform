@@ -99,60 +99,22 @@ def print_transfers():
 
 @ app.route('/volume')
 def print_volume():
-    url = "https://api.korbit.co.kr/v1/ticker/detailed/all"
+    url = "https://w2b.korbit.co.kr/v1/tickers"
 
     resp = requests.get(url)
 
     obj = resp.json()
-    # print(obj)
+    volume_dict = {}
+    # print(obj["data"][0])
+    for crypto in obj["data"]:
+        # print(crypto["counter_sum"])
+        volume_dict[crypto["currency_pair"]] = crypto["counter_sum"]
 
-    # print(obj.keys())
-
-    list_of_currency = list(obj.keys())
-
-    vol_dict = {}
-
-    for curr in list_of_currency:
-        url_vol = "https://api.korbit.co.kr/v1/transactions?time=day&currency_pair={}".format(
-            curr)
-        resp_vol = requests.get(url_vol)
-        obj_vol = resp_vol.json()
-
-        vol_dict[curr] = obj_vol
-
-    total_vol = 0.0
-
-    for i in obj:
-        total_vol += float(obj[i]['volume'])*float(obj[i]['last'])
-
-    print(total_vol)
-
-    print(obj)
-
-    dict_vol = {}
-
-    for key in obj:
-        # the comment below doesn't make sense. By doing that logic, the volume price is not correct.
-        # Instead, need to get list of filled orders from 24 hrs ago or from 00:00 onwards and then
-        # sum it up with the amount and the bought price.
-        # can to by get https://api.korbit.co.kr/v1/transactions?time=day&currency_pair=$CURRENCY_PAIR or time = hour
-
-        # volume is in shown in terms of currency, so when volume of btc is 'x' means volume in
-        # krw is 'x' * price_of_btc
-        dict_vol[key] = float(obj[key]['volume']) * float(obj[key]['last'])
-
-    # print(dict_vol)
-
+    sorted_vol = {}
     sorted_vol = dict(
-        sorted(dict_vol.items(), key=lambda item: item[1], reverse=True))
+        sorted(volume_dict.items(), key=lambda item: item[1], reverse=True))
 
-    # print(sorted_vol)
-
-    sorted_top_five = {}
-
-    sorted_top_five = dict(itertools.islice(sorted_vol.items(), 10))
-
-    return json.dumps(sorted_top_five)
+    return json.dumps(sorted_vol)
 
 
 @ app.route('/')
@@ -173,3 +135,4 @@ if __name__ == "__main__":
 # do i need a db? <- thing to consider
 # have separate for people who login and guest access
 # add coinmarketcap price and usdkrw price and compare the kimchi premium with various different korean trading sites (or just korbit for now)
+# add graphs that relates with not just price but with btc and other coins
